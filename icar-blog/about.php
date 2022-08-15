@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-$page_title = "BLOG";
+$page_title = "ABOUT";
 include './tpl/header.php';
 ?>
 
@@ -12,19 +12,10 @@ include './tpl/header.php';
         <div class="row">
             <div class="col-12 mt-5 text-center">
                 <h1 class="display-3 text-primary">
-                    <?= LOGO; ?> Blog
+                    About <?= LOGO; ?>
                 </h1>
                 <p>
-
-                    <a href="./add_post.php" class="btn btn-primary mt-2">
-                        Add New
-                    </a>
-
-                    To add a post
-                    <a href="./signup.php">create a user</a>
-                    or
-                    <a href="./signin.php">sign in</a>
-
+                    Lorem, ipsum dolor sit amet consectetur adipisicing elit. Totam, minima!
                 </p>
             </div>
         </div>
