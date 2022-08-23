@@ -1,22 +1,12 @@
 <?php
 session_start();
-
-if (isset($_SESSION['user_id'])) {
-    header('location: ./');
-    exit;
-}
-
 require_once 'app/helpers.php';
 
-$errors = [
-    'email'     => '',
-    'password'  => '',
-    'submit'    => ''
-];
+redirect_unauthorized(true);
 
 if (isset($_POST["submit"])) {
-    $email = !empty($_POST['email']) ? trim($_POST['email']) : '';
-    $password = !empty($_POST['password']) ? trim($_POST['password']) : '';
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $password = filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW);
 
     if (!$email) {
         $errors['email'] = '* A valid email is required';
@@ -25,6 +15,10 @@ if (isset($_POST["submit"])) {
     } else {
 
         $link = mysqli_connect(MYSQL_HOST, MYSQL_USER, MYSQL_PWD, MYSQL_DB);
+
+        $email = mysqli_real_escape_string($link, $email);
+        $password = mysqli_real_escape_string($link, $password);
+
         $sql = "SELECT * FROM users WHERE email='$email' AND password='$password'";
         $result = mysqli_query($link, $sql);
 
@@ -32,11 +26,7 @@ if (isset($_POST["submit"])) {
 
             $user = mysqli_fetch_assoc($result);
 
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-
-            header('location: ./');
-            exit;
+            login_user($user['id'], $user['name'], './');
         } else {
             $errors['submit'] = '* Wrong email or password';
         }
@@ -65,7 +55,7 @@ include './tpl/header.php';
     </section>
 
     <!-- PAGE CONTENT -->
-    <section id="main-content" class="continer mt-5">
+    <section id="main-content" class="container mt-5">
         <div class="row mb-2">
             <div class="col-12 col-md-6 mx-auto">
 
@@ -76,11 +66,7 @@ include './tpl/header.php';
                             Email
                         </label>
                         <input type="email" name="email" id="email" class="form-control">
-                        <?php if ($errors['email']) : ?>
-                            <span class="text-danger">
-                                <?= $errors['email']; ?>
-                            </span>
-                        <?php endif; ?>
+                        <?= field_error('email'); ?>
                     </div>
 
                     <div class="form-group mt-3">
@@ -89,19 +75,11 @@ include './tpl/header.php';
                             Password
                         </label>
                         <input type="password" name="password" id="password" class="form-control">
-                        <?php if ($errors['password']) : ?>
-                            <span class="text-danger">
-                                <?= $errors['password']; ?>
-                            </span>
-                        <?php endif; ?>
+                        <?= field_error('password'); ?>
                     </div>
 
                     <input type="submit" name="submit" value="Sign In" class="btn btn-primary mt-3">
-                    <?php if ($errors['submit']) : ?>
-                        <span class="text-danger">
-                            <?= $errors['submit']; ?>
-                        </span>
-                    <?php endif; ?>
+                    <?= field_error('submit'); ?>
                 </form>
 
             </div>

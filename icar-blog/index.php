@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'app/helpers.php';
 
 $page_title = "HOME";
 include './tpl/header.php';
@@ -25,7 +26,7 @@ include './tpl/header.php';
     </section>
 
     <!-- PAGE CONTENT -->
-    <section id="main-content" class="continer mt-5">
+    <section id="main-content" class="container mt-5">
         <div class="row mb-2">
 
             <div class="col-md-6">
@@ -47,8 +48,8 @@ include './tpl/header.php';
                             Continue reading <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
-                    <div class="col-auto d-none d-lg-block" style="max-width: 540px;">
-                        <img src="https://cdn.pixabay.com/photo/2012/04/26/14/04/car-42552__480.png" class="img-fluid rounded-start" alt="Yellow car">
+                    <div class="col-auto d-none d-lg-block">
+                        <img class="img-fluid" src="https://cdn.pixabay.com/photo/2016/02/13/13/11/oldtimer-1197800_960_720.jpg" alt="highlighted car">
                     </div>
                 </div>
             </div>
@@ -72,8 +73,8 @@ include './tpl/header.php';
                             Continue reading <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
-                    <div class="col-auto d-none d-lg-block" style="max-width: 540px;">
-                        <img src="https://cdn.pixabay.com/photo/2013/07/13/11/44/car-158548_1280.png" class="img-fluid rounded-start" alt="Red car">
+                    <div class="col-auto d-none d-lg-block">
+                        <img class="img-fluid" src="https://cdn.pixabay.com/photo/2019/07/07/14/03/fiat-500-4322521_960_720.jpg" alt="priceless car">
                     </div>
                 </div>
             </div>
