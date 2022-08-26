@@ -19,14 +19,16 @@ if (isset($_POST["submit"])) {
         $email = mysqli_real_escape_string($link, $email);
         $password = mysqli_real_escape_string($link, $password);
 
-        $sql = "SELECT * FROM users WHERE email='$email' AND password='$password'";
+        $sql = "SELECT * FROM users u LEFT JOIN user_profile up ON u.id = up.user_id WHERE u.email='$email'";
         $result = mysqli_query($link, $sql);
 
         if ($result && mysqli_num_rows($result) === 1) {
 
             $user = mysqli_fetch_assoc($result);
 
-            login_user($user['id'], $user['name'], './');
+            if (password_verify($password, $user['password'])) {
+                login_user($user['id'], $user['name'], $user['profile_image'], './');
+            }
         } else {
             $errors['submit'] = '* Wrong email or password';
         }

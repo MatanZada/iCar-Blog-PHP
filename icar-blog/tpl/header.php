@@ -38,21 +38,35 @@
                     <!-- NAVBAR LEFT LINK -->
                     <ul class="navbar-nav me-auto mb-2 mb-sm-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="about.php">About</a>
+                            <a class="nav-link" href="./about.php">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="index.php">Blog</a>
+                            <a class="nav-link" href="./blog.php">Blog</a>
                         </li>
                     </ul>
 
                     <!-- NAVBAR LEFT RIGHT -->
                     <ul class="navbar-nav ms-auto mb-2 mb-sm-0">
-                        <li class="nav-item">
-                            <a class="nav-link" href="signIn.php">Sign In</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="">Sign Up</a>
-                        </li>
+
+                        <?php if (!user_auth()) : ?>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="./signin.php">Sign In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="./signup.php">Sign Up</a>
+                            </li>
+
+                        <?php else : ?>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="./profile.php"><?= $_SESSION['user_name']; ?></a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="./signout.php">Sign Out</a>
+                            </li>
+
+                        <?php endif; ?>
                     </ul>
 
                 </div>

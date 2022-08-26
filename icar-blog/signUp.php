@@ -18,6 +18,12 @@ if (validate_csrf() && isset($_POST['submit'])) {
     $password = mysqli_real_escape_string($link, $password);
 
 
+    define('MAX_FILE_SIZE', 1024 * 1024 * 5);
+    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+    $profile_image = 'default_proflie.png';
+    $image = $_FILES['image'] ?? null;
+
+
     $is_form_valid = true;
 
     if (!$name || mb_strlen($name) < 2 || mb_strlen($name) > 70) {
@@ -30,18 +36,47 @@ if (validate_csrf() && isset($_POST['submit'])) {
         $errors['email'] = '* Email is required for a valid email address';
     }
 
+    if (email_exists($link, $email)) {
+        $is_form_valid = false;
+        $errors['submit'] = '* Email is already taken';
+    }
+
     if (!$password || mb_strlen($password) < 6 || mb_strlen($password) > 20) {
         $is_form_valid = false;
         $errors['password'] = '* Password is required for minimum 6 characters and maximum 20';
     }
 
     if ($is_form_valid) {
+
+        if (
+            isset($image) &&
+            isset($image['name']) &&
+            $image['error'] === UPLOAD_ERR_OK &&
+            $image['size'] <= MAX_FILE_SIZE &&
+            is_uploaded_file($image['tmp_name']) &&
+            in_array(pathinfo($image['name'])['extension'], $allowed)
+
+        ) {
+
+            $profile_image = date('Y.m.d.H.i.s') . '-' . $image['name'];
+            move_uploaded_file($image['tmp_name'], "images/profiles/$profile_image");
+        }
+
+        $password = password_hash($password, PASSWORD_BCRYPT);
         $sql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
         $result = mysqli_query($link, $sql);
 
         if ($result && mysqli_affected_rows($link) > 0) {
             $new_user_id = mysqli_insert_id($link);
-            login_user($new_user_id, $name, './blog.php');
+
+            $profile_image = mysqli_real_escape_string($link, $profile_image);
+            $sql = "INSERT INTO user_profile (user_id, profile_image) VALUES ($new_user_id, '$profile_image')";
+
+            $result = mysqli_query($link, $sql);
+
+            if ($result && mysqli_affected_rows($link) === 1) {
+                login_user($new_user_id, $name, $profile_image, './blog.php');
+            }
         }
     }
 }
@@ -54,6 +89,9 @@ include './tpl/header.php';
 
 <main class="container flex-fill">
 
+    <pre>
+<?php var_export(pathinfo('1358030 (1).png')); ?>
+</pre>
     <!-- PAGE HEADER -->
     <section id="main-content-top">
         <div class="row">
@@ -70,7 +108,7 @@ include './tpl/header.php';
         <div class="row mb-2">
 
             <div class="col-12 col-md-6 mx-auto">
-                <form action="" method="POST" novalidate="novalidate" autocomplete="off">
+                <form action="" method="POST" novalidate="novalidate" autocomplete="off" enctype="multipart/form-data">
 
                     <input type="hidden" name="<?= csrf_name(); ?>" value="<?= csrf(); ?>" />
 
@@ -101,6 +139,12 @@ include './tpl/header.php';
                         <?= field_error('password'); ?>
                     </div>
 
+                    <div class="form-group mt-3">
+                        <label for="image" class="form-lable">
+                            Profile Image
+                        </label>
+                        <input type="file" accept="image/*" name="image" id="image" class="form-control">
+                    </div>
 
 
                     <div class="d-flex my-3">

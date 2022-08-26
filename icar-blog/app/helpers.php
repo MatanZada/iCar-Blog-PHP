@@ -14,7 +14,19 @@ if (!function_exists('user_auth')) {
 
     function user_auth()
     {
-        return isset($_SESSION['user_id']);
+        if (
+            isset($_SESSION['user_id']) &&
+            isset($_SESSION['user_ip']) &&
+            $_SESSION['user_ip'] === $_SERVER['REMOTE_ADDR'] &&
+            isset($_SESSION['user_agent']) &&
+            $_SESSION['user_agent'] === $_SERVER['HTTP_USER_AGENT'] &&
+            isset($_SESSION['user_browser']) &&
+            $_SESSION['user_browser'] === $_SERVER['HTTP_SEC_CH_UA']
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }
 
@@ -34,11 +46,17 @@ if (!function_exists('field_error')) {
 
 if (!function_exists('login_user')) {
 
-    function login_user($uid, $name, $location = null)
+    function login_user($uid, $name, $proflie,  $location = null)
     {
 
         $_SESSION['user_id'] = $uid;
         $_SESSION['user_name'] = $name;
+        $_SESSION['profile_image'] = $proflie;
+
+        // digital finger print
+        $_SESSION['user_ip'] = $_SERVER['REMOTE_ADDR'];
+        $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+        $_SESSION['user_browser'] = $_SERVER['HTTP_SEC_CH_UA'];
 
         if (isset($location)) {
             header("location: $location");
@@ -59,6 +77,22 @@ if (!function_exists('redirect_unauthorized')) {
             header("location: $location");
             exit;
         }
+    }
+}
+
+if (!function_exists('email_exists')) {
+
+    function email_exists($link, $email)
+    {
+        $email = mysqli_real_escape_string($link, $email);
+        $sql = "SELECT * FROM users WHERE email = '$email' LIMIT 1";
+        $result = mysqli_query($link, $sql);
+
+        if ($result && mysqli_num_rows($result) > 0) {
+            return true;
+        }
+
+        return false;
     }
 }
 
